@@ -9,7 +9,7 @@ import (
 func TestNewTargetsFrom(t *testing.T) {
 	lines := bytes.NewBufferString(`GET http://lolcathost:9999/
 // HEAD http://lolcathost.com this is a comment
-HEAD http://lolcathost:9999/
+   HEAD http://lolcathost:9999/
 POST http://lolcathost:9999/ {"some":"json"}
 `)
 	targets, err := NewTargetsFrom(lines)
