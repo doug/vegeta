@@ -7,12 +7,16 @@ import (
 )
 
 func TestNewTargetsFrom(t *testing.T) {
-	lines := bytes.NewBufferString("GET http://lolcathost:9999/\n\n      // HEAD http://lolcathost.com this is a comment \nHEAD http://lolcathost:9999/\n")
+	lines := bytes.NewBufferString(`GET http://lolcathost:9999/
+// HEAD http://lolcathost.com this is a comment
+HEAD http://lolcathost:9999/
+POST http://lolcathost:9999/ {"some":"json"}
+`)
 	targets, err := NewTargetsFrom(lines)
 	if err != nil {
 		t.Fatalf("Couldn't parse valid source: %s", err)
 	}
-	for i, method := range []string{"GET", "HEAD"} {
+	for i, method := range []string{"GET", "HEAD", "POST"} {
 		if targets[i].Method != method ||
 			targets[i].URL.String() != "http://lolcathost:9999/" {
 			t.Fatalf("Request was parsed incorrectly. Got: %s %s",
@@ -22,12 +26,12 @@ func TestNewTargetsFrom(t *testing.T) {
 }
 
 func TestNewTargets(t *testing.T) {
-	lines := []string{"GET http://lolcathost:9999/", "HEAD http://lolcathost:9999/"}
+	lines := []string{"GET http://lolcathost:9999/", "HEAD http://lolcathost:9999/", `POST http://lolcathost:9999/ {"some":"json"}`}
 	targets, err := NewTargets(lines)
 	if err != nil {
 		t.Fatalf("Couldn't parse valid source: %s", err)
 	}
-	for i, method := range []string{"GET", "HEAD"} {
+	for i, method := range []string{"GET", "HEAD", "POST"} {
 		if targets[i].Method != method ||
 			targets[i].URL.String() != "http://lolcathost:9999/" {
 			t.Fatalf("Request was parsed incorrectly. Got: %s %s",

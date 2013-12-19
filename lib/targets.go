@@ -34,16 +34,25 @@ func NewTargetsFrom(source io.Reader) (Targets, error) {
 // NewTargets instantiates Targets from a slice of strings
 func NewTargets(lines []string) (Targets, error) {
 	targets := make([]*http.Request, 0)
+	var err error
+	var req *http.Request
 	for _, line := range lines {
-		parts := strings.SplitN(line, " ", 2)
-		if len(parts) != 2 {
+		parts := strings.SplitN(line, " ", 3)
+		switch len(parts) {
+		case 2:
+			req, err = http.NewRequest(parts[0], parts[1], nil)
+			if err != nil {
+				return targets, fmt.Errorf("Failed to build request: %s", err)
+			}
+		case 3:
+			req, err = http.NewRequest(parts[0], parts[1], strings.NewReader(parts[2]))
+			if err != nil {
+				return targets, fmt.Errorf("Failed to build request: %s", err)
+			}
+		default:
 			return targets, fmt.Errorf("Invalid request format: `%s`", line)
 		}
 		// Build request
-		req, err := http.NewRequest(parts[0], parts[1], nil)
-		if err != nil {
-			return targets, fmt.Errorf("Failed to build request: %s", err)
-		}
 		targets = append(targets, req)
 	}
 	return targets, nil
